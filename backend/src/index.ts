@@ -9,6 +9,7 @@ import { errorResponse } from './schemas/shared/index.js'
 import fastifyJwt from '@fastify/jwt'
 import { is } from 'zod/locales'
 import { generateRefreshToken } from './auth/refresh/index.js'
+import { createPlantSchema, plantListResponseSchema, plantResponseSchema } from './schemas/plant/index.js'
 
 const app = Fastify()
 app.setValidatorCompiler(validatorCompiler)
@@ -23,6 +24,19 @@ declare module "fastify" {
     }
 }
 
+declare module "@fastify/jwt" {
+    interface FastifyJWT {
+        payload: {
+            sub: string,
+            email: string
+        },
+        user: {
+            sub: string,
+            email: string
+        }
+    }
+}
+
 await app.register(fastifySwagger, {
     openapi: {
         info: {
@@ -30,15 +44,16 @@ await app.register(fastifySwagger, {
             description: "My Garden OpenAPI schema",
             version: "0.0.0"
         },
-    components: {
-        securitySchemes: {
-            bearerAuth: {
-                type: "http",
-                scheme: "bearer",
-                bearerFormat: "JWT"
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT"
+                }
             }
         }
-    }},
+    },
     transform: jsonSchemaTransform,
 })
 
@@ -61,7 +76,7 @@ app.decorate("authenticate", async (request: FastifyRequest, reply: FastifyReply
     try {
         await request.jwtVerify()
     } catch (err) {
-       return reply.status(401).send(err)
+        return reply.status(401).send(err)
     }
 })
 
@@ -81,7 +96,7 @@ app.withTypeProvider<ZodTypeProvider>().post('/auth/register',
             data: {
                 name: name || "",
                 email,
-                password_hash: passwordHash,
+                passwordHash,
             },
             select: {
                 id: true,
@@ -101,7 +116,7 @@ app.withTypeProvider<ZodTypeProvider>().post("/auth/login",
             return reply.status(401).send({ error: 'ERR_NOT_FOUND', message: "Invalid email or password" })
         }
 
-        const isValidPassword = await argon2.verify(existingUser.password_hash, password)
+        const isValidPassword = await argon2.verify(existingUser.passwordHash, password)
         if (!isValidPassword) {
             return reply.status(401).send({ error: 'ERR_NOT_FOUND', message: 'Invalid email or password' })
         }
@@ -112,7 +127,7 @@ app.withTypeProvider<ZodTypeProvider>().post("/auth/login",
     }
 )
 
-app.withTypeProvider<ZodTypeProvider>().get("/auth/me", 
+app.withTypeProvider<ZodTypeProvider>().get("/auth/me",
     {
         onRequest: [app.authenticate],
         schema: {
@@ -127,6 +142,86 @@ app.withTypeProvider<ZodTypeProvider>().get("/auth/me",
     async (request, reply) => {
         return reply.send(request.user)
     })
+
+app.withTypeProvider<ZodTypeProvider>().post('/plants/create',
+    {
+        onRequest: [app.authenticate],
+        schema: {
+            tags: ['plants'],
+            body: createPlantSchema,
+            security: [
+                {
+                    bearerAuth: [],
+                }
+            ]
+        }
+    },
+    async (request, reply) => {
+        const { name, description } = request.body
+        const existingPlant = await prisma.plant.findUnique({ where: { name: name, userID: request.user.sub } })
+        if (existingPlant) {
+            return reply.status(409).send({ error: "ERR_CONFLICT", message: "Plant already exists" })
+        }
+        const newPlant = await prisma.plant.create({
+            data: {
+                name,
+                description: description || "",
+                userID: request.user.sub,
+            }
+        })
+
+        return reply.status(201).send(newPlant)
+    }
+)
+
+app.withTypeProvider<ZodTypeProvider>().get('/plants/list',
+    {
+        onRequest: [app.authenticate],
+        schema: {
+            tags: ['plants'],
+            security: [
+                {
+                    bearerAuth: [],
+                }
+            ],
+            response: {
+                200: plantListResponseSchema
+            }
+        },
+    },
+    async (request, reply) => {
+        const userPlants = await prisma.plant.findMany({ where: { userID: request.user.sub } })
+        return reply.status(200).send(userPlants)
+    }
+)
+
+app.get('/plants/:id',
+    {
+        onRequest: [app.authenticate],
+        schema: {
+            tags: ['plants'],
+            security: [
+                {
+                    bearerAuth: [],
+                }
+            ],
+            response: {
+                200: plantResponseSchema,
+                404: errorResponse,
+                500: errorResponse,
+            }
+        },
+    },
+    async (request, reply) => {
+        const {id} = request.params as {id: string}
+        const existingPlant = await prisma.plant.findUnique({where: {id: id, userID: request.user.sub}})
+        if (!existingPlant) {
+            return reply.status(404).send({error: "ERR_NOT_FOUND", message: "Plant not found"})
+        }
+
+        return reply.status(200).send(existingPlant)
+    }
+)
 
 app.listen({ port: 8081 }, (err, address) => {
     if (err) {

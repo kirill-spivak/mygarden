@@ -397,7 +397,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
-  User: 'User'
+  User: 'User',
+  Plant: 'Plant'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -413,7 +414,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user"
+    modelProps: "user" | "plant"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -491,6 +492,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Plant: {
+      payload: Prisma.$PlantPayload<ExtArgs>
+      fields: Prisma.PlantFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlantFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlantFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload>
+        }
+        findFirst: {
+          args: Prisma.PlantFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlantFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload>
+        }
+        findMany: {
+          args: Prisma.PlantFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload>[]
+        }
+        create: {
+          args: Prisma.PlantCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload>
+        }
+        createMany: {
+          args: Prisma.PlantCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlantCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload>[]
+        }
+        delete: {
+          args: Prisma.PlantDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload>
+        }
+        update: {
+          args: Prisma.PlantUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlantDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlantUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlantUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlantUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlantPayload>
+        }
+        aggregate: {
+          args: Prisma.PlantAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlant>
+        }
+        groupBy: {
+          args: Prisma.PlantGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlantGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlantCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlantCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -530,12 +605,22 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
-  password_hash: 'password_hash',
+  passwordHash: 'passwordHash',
   name: 'name',
-  created_at: 'created_at'
+  createdAt: 'createdAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const PlantScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  userID: 'userID'
+} as const
+
+export type PlantScalarFieldEnum = (typeof PlantScalarFieldEnum)[keyof typeof PlantScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -724,6 +809,7 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  plant?: Prisma.PlantOmit
 }
 
 /* Types for Logging */
