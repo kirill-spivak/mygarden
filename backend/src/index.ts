@@ -1,4 +1,6 @@
 import Fastify from 'fastify'
+import { prisma } from './prisma/index.js'
+
 
 const app = Fastify()
 
