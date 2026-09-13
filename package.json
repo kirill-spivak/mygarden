@@ -1,0 +1,12 @@
+{
+  "name": "mygarden",
+  "packageManager": "yarn@4.18.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "b": "yarn workspace backend",
+    "m": "yarn workspace mobile"
+  }
+}
