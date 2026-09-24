@@ -188,13 +188,6 @@ const styles = StyleSheet.create({
     formContainer: {
         width: "100%",
     },
-    label: {
-        fontSize: 14,
-        fontWeight: "600",
-        color: "#333333",
-        marginBottom: 8,
-        marginTop: 16,
-    },
     button: {
         height: 50,
         backgroundColor: "#007aff",

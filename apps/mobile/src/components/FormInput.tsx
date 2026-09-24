@@ -20,8 +20,8 @@ export const FormInput = ({
     ...inputProps
 }: FormInputProps) => {
     return (
-        <View>
-            <Text>{label}</Text>
+        <View style={containerStyle}>
+            <Text style={styles.label}>{label}</Text>
             <TextInput {...inputProps} style={styles.input}></TextInput>
         </View>
     );
@@ -35,5 +35,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         fontSize: 16,
         color: "#1a1a1a",
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: "#333333",
+        marginBottom: 8,
+        marginTop: 16,
     },
 });
