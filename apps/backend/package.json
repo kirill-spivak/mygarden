@@ -1,18 +1,29 @@
 {
-  "name": "backend",
-  "packageManager": "yarn@4.18.0",
-  "type": "module",
-  "dependencies": {
-    "fastify": "^5.12.4"
-  },
-  "devDependencies": {
-    "@types/node": "^22.20.2",
-    "tsx": "^4.23.13",
-    "typescript": "^7.0.2"
-  },
-  "scripts": {
-    "dev": "tsx --watch src/main.ts",
-    "build": "tsc -p tsconfig.json",
-    "start": "node dist/main.js"
-  }
+    "name": "backend",
+    "packageManager": "yarn@4.18.0",
+    "type": "module",
+    "dependencies": {
+        "@fastify/cors": "^11.3.0",
+        "argon2": "^0.45.1",
+        "fastify": "^5.12.4",
+        "pg": "^8.23.0",
+        "reflect-metadata": "^0.2.2",
+        "typeorm": "^1.1.1",
+        "zod": "^4.6.5"
+    },
+    "devDependencies": {
+        "@types/node": "^22.20.2",
+        "@types/pg": "^8",
+        "tsx": "^4.23.13",
+        "typescript": "^7.0.2"
+    },
+    "scripts": {
+        "dev": "tsx --watch src/index.ts",
+        "build": "tsc -p tsconfig.json",
+        "start": "node dist/index.js",
+        "typeorm": "tsx ../../node_modules/typeorm/cli.js -d src/data-source.ts",
+        "migration:generate": "yarn typeorm migration:generate --esm",
+        "migration:run": "yarn typeorm migration:run",
+        "migration:revert": "yarn typeorm migration:revert"
+    }
 }
