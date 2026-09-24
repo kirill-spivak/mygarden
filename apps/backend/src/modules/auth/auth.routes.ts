@@ -6,10 +6,10 @@ import * as z from "zod";
 import { formatZodError } from "../../shared/utils/formatZodError.js";
 import { hashPassword } from "../../shared/utils/passwordHasher.js";
 
-export const authRoutes: FastifyPluginAsync = async (app) => {
+export const authRoutes: FastifyPluginAsync = async (fastify) => {
     const userRepository = AppDataSource.getRepository(User);
 
-    app.post("/register", async (request, reply) => {
+    fastify.post("/register", async (request, reply) => {
         const parseBody = await registerSchema.safeParseAsync(request.body);
         if (!parseBody.success) {
             return reply.code(400).send({
@@ -36,7 +36,6 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
                 id: savedUser.id,
                 name: savedUser.name,
                 email: savedUser.email,
-                passwordHash: savedUser.passwordHash
             },
         });
     });
